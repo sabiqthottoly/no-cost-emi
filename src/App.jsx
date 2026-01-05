@@ -16,9 +16,9 @@ function App() {
     <div className="app">
 
       <header className="app-header">
-        <h1>No Cost EMI <span className="highlight">Truth Revealer</span></h1>
+        <h1>Real No Cost EMI <span className="highlight">Calculator</span></h1>
         <p className="tagline">
-          Uncover the hidden costs behind "No Cost" EMI offers
+          Uncover the hidden costs behind "No Cost" EMI
         </p>
       </header>
 

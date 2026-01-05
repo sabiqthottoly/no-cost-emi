@@ -5,14 +5,15 @@ import { formatCurrency, formatCurrencyWithDecimals } from '../utils/emiCalculat
 import './Results.css';
 
 const Results = ({ data }) => {
-    const [showBreakdown, setShowBreakdown] = useState(false);
+    const [showBreakdown, setShowBreakdown] = useState(true);
 
     const exportToPDF = () => {
         try {
             const doc = new jsPDF();
 
-            // Helper to replace ₹ with INR for PDF compatibility
-            const formatForPDF = (str) => str.replace(/₹/g, 'INR ');
+            // Helper to strip currency symbol for PDF (since headers will have Rs.)
+            // We keep the formatting (commas), just remove the symbol.
+            const formatForPDF = (str) => str.replace(/₹/g, '').trim();
 
             // Title
             doc.setFontSize(18);
@@ -27,12 +28,12 @@ const Results = ({ data }) => {
             doc.setFont('helvetica', 'normal');
             doc.text('Product Price: ', 14, 32);
             doc.setFont('helvetica', 'bold');
-            doc.text(formatForPDF(formatCurrency(data.originalPrice)), 52, 32);
+            doc.text(`Rs. ${data.originalPrice.toLocaleString('en-IN')}`, 52, 32);
 
             doc.setFont('helvetica', 'normal');
             doc.text('Monthly EMI: ', 14, 38);
             doc.setFont('helvetica', 'bold');
-            doc.text(formatForPDF(formatCurrencyWithDecimals(data.monthlyEMI)), 52, 38);
+            doc.text(`Rs. ${data.monthlyEMI.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 52, 38);
 
             doc.setFont('helvetica', 'normal');
             doc.text('Tenure: ', 14, 44);
@@ -42,13 +43,25 @@ const Results = ({ data }) => {
             doc.setFont('helvetica', 'normal');
             doc.text('Total Hidden Cost: ', 14, 50);
             doc.setFont('helvetica', 'bold');
-            doc.text(formatForPDF(formatCurrencyWithDecimals(data.totalHiddenCost)), 52, 50);
+            doc.text(`Rs. ${data.totalHiddenCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 52, 50);
+
+            // Effective Monthly Cost - Highlighted
+            doc.setFontSize(12);
+            // Effective Monthly Cost - Highlighted
+            doc.setFontSize(12);
+            doc.setTextColor(60, 60, 60); // Neutral dark gray
+            doc.setFont('helvetica', 'bold');
+            doc.text('Effective Monthly Cost: ', 14, 58);
+
+            doc.setFontSize(14);
+            const effectiveMonthlyCost = data.effectivePrice / data.tenure;
+            doc.text(`Rs. ${effectiveMonthlyCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 70, 58);
 
             // Table headers
-            const headers = ['Month', 'EMI', 'Principal', 'Interest', 'GST on Int', 'Total Outflow', 'Balance'];
+            const headers = ['Month', 'EMI (Rs.)', 'Principal (Rs.)', 'Interest (Rs.)', 'GST on Int (Rs.)', 'Total Payable (Rs.)', 'Balance (Rs.)'];
             let totalOutflowCol = 5;
             if (data.processingFee > 0) {
-                headers.splice(5, 0, 'Pro Fee', 'PF GST');
+                headers.splice(5, 0, 'Pro Fee (Rs.)', 'PF GST (Rs.)');
                 totalOutflowCol = 7;
             }
 
@@ -70,11 +83,34 @@ const Results = ({ data }) => {
                 return rowData;
             });
 
+            // Calculate totals for footer
+            const totalEMI = data.monthlyBreakdown.reduce((sum, row) => sum + row.emi, 0);
+            const totalPrincipal = data.monthlyBreakdown.reduce((sum, row) => sum + row.principal, 0);
+            const totalInterest = data.monthlyBreakdown.reduce((sum, row) => sum + row.interest, 0);
+            const totalGST = data.monthlyBreakdown.reduce((sum, row) => sum + row.gstOnInterest, 0);
+
+            const footerRow = [
+                'Total',
+                formatForPDF(formatCurrencyWithDecimals(totalEMI)),
+                formatForPDF(formatCurrencyWithDecimals(totalPrincipal)),
+                formatForPDF(formatCurrencyWithDecimals(totalInterest)),
+                formatForPDF(formatCurrencyWithDecimals(totalGST)),
+            ];
+
+            if (data.processingFee > 0) {
+                footerRow.push(formatForPDF(formatCurrency(data.processingFee)));
+                footerRow.push(formatForPDF(formatCurrencyWithDecimals(data.gstOnProcessingFee)));
+            }
+
+            footerRow.push(formatForPDF(formatCurrencyWithDecimals(data.effectivePrice)));
+            footerRow.push('-'); // Balance
+
             // Generate table using autoTable
             autoTable(doc, {
                 head: [headers],
                 body: tableData,
-                startY: 58,
+                foot: [footerRow],
+                startY: 68,
                 theme: 'grid',
                 styles: {
                     fontSize: 8,
@@ -86,6 +122,12 @@ const Results = ({ data }) => {
                     textColor: 255,
                     fontStyle: 'bold',
                     halign: 'center',
+                },
+                footStyles: {
+                    fillColor: [240, 240, 240], // Light gray background
+                    textColor: [60, 60, 60], // Dark gray text
+                    fontStyle: 'bold',
+                    halign: 'right',
                 },
                 columnStyles: {
                     0: { halign: 'center' },
@@ -118,26 +160,26 @@ const Results = ({ data }) => {
                 <h2>📊 EMI Calculation Results</h2>
             </div>
 
-            {/* Compact Stats Strip */}
+            {/* Top Stats Strip */}
             <div className="stats-strip">
-                <div className="main-emi">
-                    <span className="emi-value">{formatCurrencyWithDecimals(data.monthlyEMI)}</span>
-                    <span className="emi-label">per month × {data.tenure} months</span>
+                <div className="stat-item emi-display">
+                    <span className="stat-label">Real Monthly Cost</span>
+                    <span className="emi-value">{formatCurrencyWithDecimals(data.effectivePrice / data.tenure)}</span>
+                    <div className="emi-comparison">
+                        <span className="comparison-label">vs Bank EMI: </span>
+                        <span className="comparison-value">{formatCurrencyWithDecimals(data.originalPrice / data.tenure)}</span>
+                    </div>
+                    <span className="emi-sublabel">for {data.tenure} months</span>
                 </div>
-                <div className="quick-stats">
-                    <div className="quick-stat">
-                        <span className="qs-value">{formatCurrency(data.originalPrice)}</span>
-                        <span className="qs-label">Price</span>
-                    </div>
-                    <div className="quick-stat">
-                        <span className="qs-value green">−{formatCurrency(data.discountGiven)}</span>
-                        <span className="qs-label">Discount</span>
-                    </div>
-                    <div className="quick-stat">
-                        <span className="qs-value yellow">+{formatCurrency(data.totalInterest)}</span>
-                        <span className="qs-label">Interest</span>
-                    </div>
-                </div>
+            </div>
+
+            {/* Mechanism Explanation - Simplified */}
+            <div className="mechanism-simple">
+                <span className="mech-icon">ℹ️</span>
+                <p>
+                    Bank charges interest of <span className="highlight-red">{formatCurrencyWithDecimals(data.totalInterest)}</span>,
+                    which is offset by an upfront discount of <span className="highlight-green">{formatCurrencyWithDecimals(data.discountGiven || data.totalInterest)}</span>.
+                </p>
             </div>
 
             {/* Hidden Costs Alert */}
@@ -196,6 +238,10 @@ const Results = ({ data }) => {
                     <span className="final-label">Effective Price You Pay</span>
                     <span className="final-value">{formatCurrencyWithDecimals(data.effectivePrice)}</span>
                 </div>
+                <div className="final-row effective-monthly">
+                    <span className="final-label">Effective Monthly Cost</span>
+                    <span className="final-value">{formatCurrencyWithDecimals(data.effectivePrice / data.tenure)}</span>
+                </div>
                 <div className="price-difference">
                     <span>You pay</span>
                     <span className="diff-amount">{formatCurrencyWithDecimals(data.totalHiddenCost)}</span>
@@ -220,8 +266,9 @@ const Results = ({ data }) => {
 
             {/* Monthly Breakdown Table */}
             {showBreakdown && (
-                <div className="breakdown-table-container">
-                    <table className="breakdown-table">
+                <div className="breakdown-container">
+                    {/* Desktop Table */}
+                    <table className="breakdown-table desktop-only">
                         <thead>
                             <tr>
                                 <th>Month</th>
@@ -232,16 +279,16 @@ const Results = ({ data }) => {
                                     <span data-tooltip="GST on Interest (18%)">GST on Int</span>
                                 </th>
                                 {data.processingFee > 0 && (
-                                    <th className="tooltip-header">
-                                        <span data-tooltip="Processing Fee">Pro Fee</span>
-                                    </th>
+                                    <>
+                                        <th className="tooltip-header">
+                                            <span data-tooltip="Processing Fee">Pro Fee</span>
+                                        </th>
+                                        <th className="tooltip-header">
+                                            <span data-tooltip="GST on Processing Fee (18%)">PF GST</span>
+                                        </th>
+                                    </>
                                 )}
-                                {data.processingFee > 0 && (
-                                    <th className="tooltip-header">
-                                        <span data-tooltip="GST on Processing Fee (18%)">PF GST</span>
-                                    </th>
-                                )}
-                                <th>Total Outflow</th>
+                                <th>Total Payable Amount</th>
                                 <th>Balance</th>
                             </tr>
                         </thead>
@@ -254,21 +301,86 @@ const Results = ({ data }) => {
                                     <td className="interest">{formatCurrencyWithDecimals(row.interest)}</td>
                                     <td className="gst">{formatCurrencyWithDecimals(row.gstOnInterest)}</td>
                                     {data.processingFee > 0 && (
-                                        <td className={row.processingFee > 0 ? 'processing-fee' : ''}>
-                                            {row.processingFee > 0 ? formatCurrency(row.processingFee) : '-'}
-                                        </td>
-                                    )}
-                                    {data.processingFee > 0 && (
-                                        <td className={row.processingFeeGST > 0 ? 'processing-fee' : ''}>
-                                            {row.processingFeeGST > 0 ? formatCurrencyWithDecimals(row.processingFeeGST) : '-'}
-                                        </td>
+                                        <>
+                                            <td className={row.processingFee > 0 ? 'processing-fee' : ''}>
+                                                {row.processingFee > 0 ? formatCurrency(row.processingFee) : '-'}
+                                            </td>
+                                            <td className={row.processingFeeGST > 0 ? 'processing-fee' : ''}>
+                                                {row.processingFeeGST > 0 ? formatCurrencyWithDecimals(row.processingFeeGST) : '-'}
+                                            </td>
+                                        </>
                                     )}
                                     <td className="total-outflow">{formatCurrencyWithDecimals(row.totalOutflow)}</td>
                                     <td>{formatCurrencyWithDecimals(row.balance)}</td>
                                 </tr>
                             ))}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th>{formatCurrencyWithDecimals(data.monthlyBreakdown.reduce((sum, row) => sum + row.emi, 0))}</th>
+                                <th>{formatCurrencyWithDecimals(data.monthlyBreakdown.reduce((sum, row) => sum + row.principal, 0))}</th>
+                                <th>{formatCurrencyWithDecimals(data.monthlyBreakdown.reduce((sum, row) => sum + row.interest, 0))}</th>
+                                <th>{formatCurrencyWithDecimals(data.monthlyBreakdown.reduce((sum, row) => sum + row.gstOnInterest, 0))}</th>
+                                {data.processingFee > 0 && (
+                                    <>
+                                        <th>{formatCurrency(data.processingFee)}</th>
+                                        <th>{formatCurrencyWithDecimals(data.gstOnProcessingFee)}</th>
+                                    </>
+                                )}
+                                <th>{formatCurrencyWithDecimals(data.effectivePrice)}</th>
+                                <th>-</th>
+                            </tr>
+                        </tfoot>
                     </table>
+
+                    {/* Mobile List View */}
+                    <div className="mobile-breakdown-list mobile-only">
+                        {data.monthlyBreakdown.map((row) => (
+                            <div key={row.month} className={`mobile-card ${row.month === 1 && data.processingFee > 0 ? 'highlight-card' : ''}`}>
+                                <div className="card-header">
+                                    <span className="month-badge">Month {row.month}</span>
+                                    <span className="card-total">{formatCurrencyWithDecimals(row.totalOutflow)}</span>
+                                </div>
+                                <div className="card-row">
+                                    <span>EMI</span>
+                                    <span>{formatCurrencyWithDecimals(row.emi)}</span>
+                                </div>
+                                <div className="card-row">
+                                    <span>Principal</span>
+                                    <span className="text-muted">{formatCurrencyWithDecimals(row.principal)}</span>
+                                </div>
+                                <div className="card-row">
+                                    <span>Interest</span>
+                                    <span className="text-warning">{formatCurrencyWithDecimals(row.interest)}</span>
+                                </div>
+                                <div className="card-row">
+                                    <span>GST on Int</span>
+                                    <span className="text-danger">{formatCurrencyWithDecimals(row.gstOnInterest)}</span>
+                                </div>
+                                {(row.processingFee > 0 || row.processingFeeGST > 0) && (
+                                    <div className="card-extras">
+                                        {row.processingFee > 0 && (
+                                            <div className="card-row extra">
+                                                <span>Processing Fee</span>
+                                                <span>{formatCurrency(row.processingFee)}</span>
+                                            </div>
+                                        )}
+                                        {row.processingFeeGST > 0 && (
+                                            <div className="card-row extra">
+                                                <span>PF GST</span>
+                                                <span>{formatCurrencyWithDecimals(row.processingFeeGST)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                <div className="card-row balance-row">
+                                    <span>Balance</span>
+                                    <span>{formatCurrencyWithDecimals(row.balance)}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 

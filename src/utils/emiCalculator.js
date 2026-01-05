@@ -104,6 +104,27 @@ export const generateMonthlyBreakdown = (principal, annualRate, tenureMonths, em
 };
 
 /**
+ * Find the effective interest rate given principal, tenure, and total interest
+ * (Uses binary search to find the rate that results in the specific total interest)
+ */
+const findEffectiveInterestRate = (principal, tenureMonths, targetTotalInterest) => {
+  if (targetTotalInterest <= 0) return 0;
+
+  const targetEMI = (principal + targetTotalInterest) / tenureMonths;
+  let low = 0;
+  let high = 100; // Start with max 100% annual rate
+
+  for (let i = 0; i < 20; i++) { // 20 iterations for high precision
+    let mid = (low + high) / 2;
+    let emi = calculateEMI(principal, mid, tenureMonths);
+    if (emi < targetEMI) low = mid;
+    else high = mid;
+  }
+
+  return (low + high) / 2;
+};
+
+/**
  * Complete No Cost EMI calculation
  * 
  * @param {Object} params - Calculation parameters
@@ -121,21 +142,49 @@ export const calculateNoCostEMI = ({
   discount = null,
   processingFee = 0
 }) => {
-  // Step 1: Calculate what the interest would be on the full price
-  const tempEMI = calculateEMI(productPrice, interestRate, tenure);
-  const estimatedInterest = calculateTotalInterest(tempEMI, tenure, productPrice);
+  let actualDiscount;
+  let totalInterest;
+  let actualEMI;
+  let calculationRate = interestRate;
 
-  // Step 2: The "No Cost" discount equals the interest (if not specified)
-  const actualDiscount = discount !== null ? discount : estimatedInterest;
+  if (discount !== null && discount > 0) {
+    // If discount is provided manually, use it
+    actualDiscount = discount;
+    const discountedPrincipal = productPrice - actualDiscount;
 
-  // Step 3: Calculate the discounted principal (what goes into the loan)
+    // For manual discount, we calculate the EMI based on the discounted principal
+    // (This overrides the "No Cost" assumption if the discount doesn't perfectly align)
+    actualEMI = calculateEMI(discountedPrincipal, interestRate, tenure);
+    totalInterest = calculateTotalInterest(actualEMI, tenure, discountedPrincipal);
+    calculationRate = interestRate; // Use the provided rate
+  } else {
+    // Reverse EMI Calculation Logic (Standard Bank Method for No Cost EMI)
+    // 1. Target EMI is simply Price / Tenure
+    const targetEMI = productPrice / tenure;
+
+    // 2. Calculate the "Present Value" (Principal) required to generate this EMI
+    // Formula: P = EMI * [ (1 - (1+r)^-n) / r ]
+    const monthlyRate = interestRate / 12 / 100;
+
+    let principalFromEMI;
+    if (monthlyRate === 0) {
+      principalFromEMI = productPrice;
+    } else {
+      principalFromEMI = targetEMI * (1 - Math.pow(1 + monthlyRate, -tenure)) / monthlyRate;
+    }
+
+    // 3. The discount is the difference between Price and this calculated Principal
+    // (Product Price - Principal = Interest Component, which is the Discount)
+    actualDiscount = productPrice - principalFromEMI;
+
+    // 4. Set values for breakdown
+    actualEMI = targetEMI;
+    totalInterest = actualDiscount; // In No Cost EMI, Discount = Interest
+
+    // Note: We use the calculated principal for the loan
+  }
+
   const discountedPrincipal = productPrice - actualDiscount;
-
-  // Step 4: Calculate actual EMI on discounted principal
-  const actualEMI = calculateEMI(discountedPrincipal, interestRate, tenure);
-
-  // Step 5: Calculate the actual total interest
-  const totalInterest = calculateTotalInterest(actualEMI, tenure, discountedPrincipal);
 
   // Step 6: Calculate GST on interest (hidden cost!)
   const gstOnInterest = calculateGSTOnInterest(totalInterest);
@@ -146,7 +195,7 @@ export const calculateNoCostEMI = ({
   // Step 8: Generate monthly breakdown with GST and processing fee
   const monthlyBreakdown = generateMonthlyBreakdown(
     discountedPrincipal,
-    interestRate,
+    calculationRate,
     tenure,
     actualEMI,
     processingFee,
@@ -163,7 +212,7 @@ export const calculateNoCostEMI = ({
     originalPrice: productPrice,
     discountGiven: actualDiscount,
     discountedPrincipal,
-    interestRate,
+    interestRate: calculationRate, // Return the rate used for breakdown
     tenure,
     processingFee,
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BANKS, BANK_DATA } from '../utils/bankData';
 import './Calculator.css';
 
 const Calculator = ({ onCalculate }) => {
@@ -7,10 +8,31 @@ const Calculator = ({ onCalculate }) => {
         interestRate: '15',
         tenure: '6',
         discount: '',
-        processingFee: '',
+        processingFee: '299',
     });
 
+    const [selectedBank, setSelectedBank] = useState('');
     const [errors, setErrors] = useState({});
+
+    // Effect to update rate when Bank or Tenure changes
+    useEffect(() => {
+        if (selectedBank && formData.tenure) {
+            const bankInfo = BANK_DATA[selectedBank];
+            if (bankInfo && bankInfo.rates) {
+                // Find rate for selected tenure
+                const rate = bankInfo.rates[formData.tenure];
+
+                // If specific rate exists for this tenure, update it.
+                // Otherwise we keep the current one (or could warn user).
+                if (rate) {
+                    setFormData(prev => ({
+                        ...prev,
+                        interestRate: rate.toString()
+                    }));
+                }
+            }
+        }
+    }, [selectedBank, formData.tenure]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -18,9 +40,50 @@ const Calculator = ({ onCalculate }) => {
             ...prev,
             [name]: value
         }));
+
+        // If user manually changes processing fee, deselect bank
+        if (name === 'processingFee') {
+            setSelectedBank('');
+        }
+
+        // If user manually changes interest rate, we don't necessarily deselect bank,
+        // but it means they are overriding the auto-fill.
+
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const handleBankChange = (e) => {
+        const bankName = e.target.value;
+        setSelectedBank(bankName);
+
+        const bankInfo = BANK_DATA[bankName];
+
+        if (bankInfo) {
+            // Update Processing Fee
+            const newFee = bankInfo.processingFee.toString();
+
+            // Update Interest Rate based on current tenure
+            let newRate = formData.interestRate;
+            if (bankInfo.rates && formData.tenure) {
+                const rateForTenure = bankInfo.rates[formData.tenure];
+                if (rateForTenure) {
+                    newRate = rateForTenure.toString();
+                }
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                processingFee: newFee,
+                interestRate: newRate
+            }));
+
+            // Clear processing fee error if any
+            if (errors.processingFee) {
+                setErrors(prev => ({ ...prev, processingFee: '' }));
+            }
         }
     };
 
@@ -61,8 +124,9 @@ const Calculator = ({ onCalculate }) => {
             interestRate: '15',
             tenure: '6',
             discount: '',
-            processingFee: '',
+            processingFee: '299',
         });
+        setSelectedBank('');
         setErrors({});
     };
 
@@ -107,7 +171,7 @@ const Calculator = ({ onCalculate }) => {
                             value={formData.interestRate}
                             onChange={handleChange}
                             placeholder="15"
-                            step="0.1"
+                            step="0.01"
                             className={errors.interestRate ? 'error' : ''}
                         />
                         {errors.interestRate && <span className="error-text">{errors.interestRate}</span>}
@@ -132,6 +196,26 @@ const Calculator = ({ onCalculate }) => {
                         />
                         {errors.tenure && <span className="error-text">{errors.tenure}</span>}
                     </div>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="bankSelect">
+                        <span className="label-icon">🏦</span>
+                        Select Your Bank (Optional)
+                    </label>
+                    <select
+                        id="bankSelect"
+                        value={selectedBank}
+                        onChange={handleBankChange}
+                        className="bank-select"
+                    >
+                        <option value="">-- Choose Your Bank (Auto-fills Rate & Fee) --</option>
+                        {BANKS.map(bankName => (
+                            <option key={bankName} value={bankName}>
+                                {bankName}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="form-row">
@@ -167,6 +251,11 @@ const Calculator = ({ onCalculate }) => {
                         />
                     </div>
                 </div>
+
+                <p className="disclaimer-text">
+                    ⚠️ <strong>Disclaimer:</strong> Interest rates and processing fees are automatically populated based on standard bank data.
+                    However, these may vary by card type or ongoing offers. Please verify with your bank.
+                </p>
 
                 <div className="button-group">
                     <button type="submit" className="btn-calculate">
