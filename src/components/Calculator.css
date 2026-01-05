@@ -1,0 +1,171 @@
+.calculator-card {
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 16px;
+  padding: 2.5rem;
+}
+
+.calculator-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.calculator-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.calculator-header p {
+  color: #737373;
+  font-size: 0.95rem;
+}
+
+.calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #d4d4d4;
+}
+
+.label-icon {
+  font-size: 1rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.optional {
+  font-size: 0.75rem;
+  color: #525252;
+  font-weight: 400;
+  margin-left: auto;
+  padding: 2px 8px;
+  background: #1f1f1f;
+  border-radius: 4px;
+}
+
+.form-group input {
+  padding: 1rem 1.25rem;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+}
+
+.form-group input::placeholder {
+  color: #525252;
+}
+
+.form-group input.error {
+  border-color: #ef4444;
+}
+
+.error-text {
+  font-size: 0.8rem;
+  color: #ef4444;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btn-calculate {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: #8b5cf6;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-calculate:hover {
+  background: #7c3aed;
+}
+
+.btn-calculate:active {
+  background: #6d28d9;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-calculate:hover .btn-icon {
+  transform: translateX(4px);
+}
+
+.btn-reset {
+  padding: 1rem 1.5rem;
+  background: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #a3a3a3;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+  background: #262626;
+  color: #fff;
+}
+
+/* Number input spinner styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}

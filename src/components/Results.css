@@ -1,0 +1,476 @@
+.results-card {
+    background: #141414;
+    border: 1px solid #262626;
+    border-radius: 16px;
+    padding: 2.5rem;
+}
+
+.results-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+/* Compact Stats Strip */
+.stats-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 10px;
+}
+
+.main-emi {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.emi-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #8b5cf6;
+}
+
+.emi-label {
+    font-size: 0.75rem;
+    color: #525252;
+}
+
+.quick-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.quick-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.qs-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #a3a3a3;
+}
+
+.qs-value.green {
+    color: #22c55e;
+}
+
+.qs-value.yellow {
+    color: #eab308;
+}
+
+.qs-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #525252;
+}
+
+@media (max-width: 600px) {
+    .stats-strip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .quick-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .quick-stat {
+        align-items: center;
+    }
+}
+
+/* Hidden Costs Section */
+.hidden-costs-section {
+    background: #1a0a0a;
+    border: 1px solid #3f1515;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+}
+
+.alert-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fbbf24;
+    margin: 0;
+}
+
+.hidden-costs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hidden-cost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #0d0d0d;
+    border: 1px solid #262626;
+    border-radius: 8px;
+}
+
+.cost-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.cost-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #ef4444;
+}
+
+.cost-description {
+    font-size: 0.7rem;
+    color: #737373;
+}
+
+.cost-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ef4444;
+}
+
+.hidden-cost-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #2a1010;
+    border: 1px solid #3f1515;
+    border-radius: 8px;
+    margin-top: 0.25rem;
+}
+
+.total-label {
+    font-weight: 600;
+    color: #fbbf24;
+}
+
+.total-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+/* Final Summary */
+.final-summary {
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.final-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #262626;
+}
+
+.final-row:last-of-type {
+    border-bottom: none;
+}
+
+.final-row.total {
+    padding-top: 1rem;
+    border-top: 1px solid #404040;
+    margin-top: 0.5rem;
+}
+
+.final-label {
+    color: #737373;
+    font-size: 0.95rem;
+}
+
+.final-row.total .final-label {
+    color: #fff;
+    font-weight: 600;
+}
+
+.final-value {
+    font-weight: 600;
+    color: #fff;
+}
+
+.final-value.hidden {
+    color: #ef4444;
+}
+
+.final-row.total .final-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.price-difference {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #1a0a0a;
+    border: 1px solid #3f1515;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #ef4444;
+}
+
+.diff-amount {
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+/* Breakdown Toggle */
+.breakdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    color: #a3a3a3;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.breakdown-toggle:hover {
+    background: #1f1f1f;
+    color: #fff;
+}
+
+.toggle-icon {
+    transition: transform 0.2s ease;
+}
+
+.toggle-icon.open {
+    transform: rotate(180deg);
+}
+
+/* Export Button */
+.breakdown-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.breakdown-controls .breakdown-toggle {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    color: #a3a3a3;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.export-btn:hover {
+    background: #262626;
+    color: #fff;
+    border-color: #8b5cf6;
+}
+
+.export-btn span:first-child {
+    font-size: 1rem;
+}
+
+/* Breakdown Table */
+.breakdown-table-container {
+    overflow-x: auto;
+    overflow-y: visible;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #262626;
+    position: relative;
+}
+
+.breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.breakdown-table th,
+.breakdown-table td {
+    padding: 0.75rem 0.5rem;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.breakdown-table th:first-child,
+.breakdown-table td:first-child {
+    text-align: center;
+}
+
+.breakdown-table th {
+    background: #1f1f1f;
+    color: #a3a3a3;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #262626;
+}
+
+/* Custom CSS Tooltip */
+.breakdown-table th.tooltip-header {
+    position: relative;
+    overflow: visible;
+}
+
+.breakdown-table th.tooltip-header span {
+    cursor: help;
+    border-bottom: 1px dashed #525252;
+    position: relative;
+    display: inline-block;
+}
+
+.breakdown-table th.tooltip-header span::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #404040;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1000;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+.breakdown-table th.tooltip-header span::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: #404040;
+    margin-top: -4px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.breakdown-table th.tooltip-header span:hover::after,
+.breakdown-table th.tooltip-header span:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+.breakdown-table tbody tr {
+    border-bottom: 1px solid #1f1f1f;
+}
+
+.breakdown-table tbody tr:hover {
+    background: #1a1a1a;
+}
+
+.breakdown-table td {
+    color: #d4d4d4;
+}
+
+.breakdown-table tbody tr.first-month {
+    background: #1a1510;
+}
+
+.breakdown-table tbody tr.first-month:hover {
+    background: #1f1a12;
+}
+
+/* Explanation Section */
+.explanation-section {
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.explanation-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #a78bfa;
+    margin-bottom: 1rem;
+}
+
+.explanation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.explanation-list li {
+    padding: 0.75rem 1rem;
+    background: #0d0d0d;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #a3a3a3;
+    line-height: 1.5;
+}
+
+.explanation-list li strong {
+    color: #d4d4d4;
+}

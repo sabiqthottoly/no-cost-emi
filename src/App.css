@@ -1,0 +1,112 @@
+/* App Layout */
+.app {
+  min-height: 100vh;
+  position: relative;
+  background: #0d0d0d;
+}
+
+/* Header */
+.app-header {
+  text-align: center;
+  padding: 3rem 2rem 2rem;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 50px;
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+}
+
+.logo-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  letter-spacing: 1px;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .app-header h1 {
+    font-size: 1.75rem;
+  }
+}
+
+.highlight {
+  color: #f97316;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: #737373;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Main Content - 80% width */
+.app-main {
+  width: 80%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    width: 95%;
+    padding: 1.5rem 0;
+  }
+}
+
+.calculator-container,
+.results-container {
+  width: 100%;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid #1f1f1f;
+  background: #0a0a0a;
+}
+
+.app-footer p {
+  color: #737373;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.app-footer p:first-child {
+  margin-bottom: 0.5rem;
+  color: #a3a3a3;
+}
+
+.app-footer strong {
+  color: #f97316;
+}
+
+.copyright {
+  font-size: 0.8rem !important;
+  margin-top: 0.75rem !important;
+  color: #525252 !important;
+}
